@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel= "stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+
+    <style>
+       #map {
+        
+        height: 450px;
+        width: 100%;
+       }
+        .jumbotron{
+                text-align:center;
+                color: #f2f2f2;
+                opacity: 0.8;
+                background-image: url("https://cdn-images-1.medium.com/max/1500/1*m2gDBT_nc-iE7R4AM3sHBQ.jpeg");
+            }
+            .container{
+                text-align:center;
+            }
+            
+    </style>
+    <title>Geoographic Information System</title>
+  </head>
+  <body >
+      <div class="jumbotron " >
+          <h1>Land classification using <strong>Convolutional Neural Network </strong></h1>
+      </div>
+    <div   id="map" > </div>
+    <script>
+
+
+var heatmap={};
+var map={};
+  function initMap(lat= 12.9716,long=77.5946,zoom=12) {
+    
+   var banglore = {lat: lat, lng:long};
+   
+   
+         map = new google.maps.Map(document.getElementById('map'), {
+          zoom: zoom,
+          center: banglore,
+          mapTypeId: 'satellite',
+       
+
+        });
+
+
+}
+var data={};
+$(document).ready(function(){
+  
+       $("#loadjson").change(function(){
+     
+       initMap(map.getCenter().lat(),map.getCenter().lng(),map.getZoom());
+        $.ajax({url: "/loadjson?id="+this.value, success: function(data){
+          
+          
+          len=Object.keys(data["lat"]).length;
+          heatMapData=[];
+         for(i=0;i<parseInt(len);i++){
+          var s=""+i+"";
+          heatMapData.push( {location: new google.maps.LatLng(data['lat'][s], data["long"][s]), weight: 1});
+         
+         }
+       
+
+        heatmap = new google.maps.visualization.HeatmapLayer({
+        data:heatMapData,
+        radius: 20
+        
+        });
+
+        heatmap.setMap(map);
+          
+         }, error: function(xhr){
+        alert('Request Status: ' + xhr.status + ' Status Text: ' + xhr.statusText + ' ' + xhr.responseText);
+    }});
+     
+    });
+});
+</script>
+
+    <script 
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDLO-Q_SGZ7XWB99B3P_Rq_uBlc96Qu9BA&libraries=visualization&callback=initMap">
+    async defer
+    </script>
+  <div class="container"  >
+      <button class=  "btn btn-lg primary" > Select the Filter
+         <select id="loadjson"  >
+          <h3>Select the filter</h3>
+           <option >select class</option>
+            <option value="0">lake</option>
+            <option value="1">airplane</option>
+            <option value="2">buildings</option>
+            <option value="3">chaparral</option>
+            <option value="4">forest</option>
+            <option value="5">overpass</option>
+        </select> 
+      </button>
+  </div>
+
+  </body>
+</html>
+
